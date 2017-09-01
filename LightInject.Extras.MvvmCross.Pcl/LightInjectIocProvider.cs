@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MvvmCross.Platform.Core;
 using MvvmCross.Platform.IoC;
 
-namespace LightInject.Extras.MvvmCross.Wpf
+namespace LightInject.Extras.MvvmCross
 {
     public class LightInjectIocProvider : MvxSingleton<IMvxIoCProvider>, IMvxIoCProvider
     {
