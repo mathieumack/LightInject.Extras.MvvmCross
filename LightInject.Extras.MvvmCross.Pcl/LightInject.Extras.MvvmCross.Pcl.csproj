@@ -35,6 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ComponentNotRegisteredException.cs" />
+    <Compile Include="DependencyResolutionException.cs" />
     <Compile Include="LightInjectIocProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

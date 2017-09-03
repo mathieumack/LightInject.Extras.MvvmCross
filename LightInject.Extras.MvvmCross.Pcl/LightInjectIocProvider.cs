@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LightInject.Extras.MvvmCross.Pcl;
 using MvvmCross.Platform.Core;
 using MvvmCross.Platform.IoC;
 
@@ -10,6 +9,8 @@ namespace LightInject.Extras.MvvmCross
 {
     public class LightInjectIocProvider : MvxSingleton<IMvxIoCProvider>, IMvxIoCProvider
     {
+        private const string serviceName = "LightInjectServiceName";
+
         readonly IServiceContainer container;
 
         readonly Dictionary<Type, Action> callbackRegisters;
@@ -65,7 +66,6 @@ namespace LightInject.Extras.MvvmCross
         {
             if (type == null)
                 throw new ArgumentNullException("type");
-
             if (action == null)
                 throw new ArgumentNullException("action");
 
@@ -124,7 +124,8 @@ namespace LightInject.Extras.MvvmCross
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            return container.(type);
+            return container.CanGetInstance(type, serviceName);
+            //return item != null && item.Any(e => e.GetType().Equals(type));
         }
 
         /// <summary>
@@ -192,16 +193,14 @@ namespace LightInject.Extras.MvvmCross
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            var service = new TypedService(type);
-            IComponentRegistration registration;
-            if (!container.ComponentRegistry.TryGetRegistration(service, out registration))
-                throw new ComponentNotRegisteredException(service);
-
-            if (registration.Sharing != InstanceSharing.Shared || !(registration.Lifetime is RootScopeLifetime))
+            var item = container.GetAllInstances(type);
+            if(item != null && item.Count() > 1)
                 // Ensure the dependency is registered as a singleton WITHOUT resolving the dependency twice.
-                throw new DependencyResolutionException(String.Format(CultureInfo.CurrentCulture, AutofacMvxIocProviderResources.TypeNotRegisteredAsSingleton, type));
-
-            return Resolve(type);
+                throw new DependencyResolutionException(type.Name + "is registered more than once time.");
+            else if (item != null && item.Count(e => e.GetType().Equals(type)) == 1)
+                return item.First(e => e.GetType().Equals(type));
+            else
+                throw new ComponentNotRegisteredException(type.Name + " not registered");
         }
 
         /// <summary>
@@ -287,8 +286,8 @@ namespace LightInject.Extras.MvvmCross
                 throw new ArgumentNullException("tInterface");
             if (theObject == null)
                 throw new ArgumentNullException("theObject");
-            
-            container.RegisterInstance(tInterface, theObject);
+
+            container.RegisterInstance(tInterface, theObject, serviceName);
             if (callbackRegisters.ContainsKey(tInterface))
                 callbackRegisters[tInterface]();
         }
@@ -310,11 +309,10 @@ namespace LightInject.Extras.MvvmCross
         {
             if (tInterface == null)
                 throw new ArgumentNullException("tInterface");
-
             if (theConstructor == null)
                 throw new ArgumentNullException("theConstructor");
 
-            container.RegisterInstance(tInterface, theConstructor());
+            container.RegisterInstance(tInterface, theConstructor(), serviceName);
             if (callbackRegisters.ContainsKey(tInterface))
                 callbackRegisters[tInterface]();
         }
@@ -360,7 +358,7 @@ namespace LightInject.Extras.MvvmCross
             if (constructor == null)
                 throw new ArgumentNullException("constructor");
             
-            container.RegisterInstance(typeof(TInterface), constructor());
+            var callbackRegisters = container.Register<TInterface>((type, service) => { return constructor(); });
             if (callbackRegisters.ContainsKey(typeof(TInterface)))
                 callbackRegisters[typeof(TInterface)]();
         }
@@ -382,11 +380,10 @@ namespace LightInject.Extras.MvvmCross
         {
             if (t == null)
                 throw new ArgumentNullException("t");
-
             if (constructor == null)
                 throw new ArgumentNullException("constructor");
 
-            container.RegisterInstance(t, constructor());
+            container.RegisterInstance(t, constructor(), serviceName);
             if (callbackRegisters.ContainsKey(t))
                 callbackRegisters[t]();
         }
@@ -414,11 +411,10 @@ namespace LightInject.Extras.MvvmCross
         {
             if (tFrom == null)
                 throw new ArgumentNullException("tFrom");
-
             if (tTo == null)
                 throw new ArgumentNullException("tTo");
 
-            container.Register(tFrom, tTo);
+            container.Register(tFrom, tTo, serviceName);
             if (callbackRegisters.ContainsKey(tFrom))
                 callbackRegisters[tFrom]();
         }
@@ -454,7 +450,7 @@ namespace LightInject.Extras.MvvmCross
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            return container.GetInstance(type);
+            return container.GetInstance(type, serviceName);
         }
 
         /// <summary>
@@ -499,7 +495,7 @@ namespace LightInject.Extras.MvvmCross
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            var item = container.TryGetInstance(type);
+            var item = container.TryGetInstance(type, serviceName);
             if (item != null)
             {
                 resolved = item;
