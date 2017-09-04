@@ -2,7 +2,7 @@
  <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>LightInject.Extras.MvvmCross.Pcl</id>
-        <version>1.0.0.0</version>
+        <version>{BuildNumberVersion}</version>
         <title>LightInject ioc compatibility dll for MvvmCross apps</title>
         <authors>MACK Mathieu</authors>
         <owners>MACK Mathieu</owners>
