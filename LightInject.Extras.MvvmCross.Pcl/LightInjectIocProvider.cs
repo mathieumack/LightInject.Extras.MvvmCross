@@ -9,11 +9,12 @@ namespace LightInject.Extras.MvvmCross
 {
     public class LightInjectIocProvider : MvxSingleton<IMvxIoCProvider>, IMvxIoCProvider
     {
-        private const string serviceName = "LightInjectServiceName";
+        //private const string serviceName = "LightInjectServiceName";
 
         readonly IServiceContainer container;
 
         readonly Dictionary<Type, Action> callbackRegisters;
+        private readonly List<Type> singletons;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceContainer"/> class.
@@ -31,6 +32,7 @@ namespace LightInject.Extras.MvvmCross
 
             this.container = new ServiceContainer();
             this.callbackRegisters = new Dictionary<Type, Action>();
+            singletons = new List<Type>();
         }
 
         /// <summary>
@@ -124,8 +126,8 @@ namespace LightInject.Extras.MvvmCross
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            return container.CanGetInstance(type, serviceName);
-            //return item != null && item.Any(e => e.GetType().Equals(type));
+            var item = container.GetAllInstances(type);
+            return item != null && item.Any(e => e.GetType().Equals(type));
         }
 
         /// <summary>
@@ -192,9 +194,9 @@ namespace LightInject.Extras.MvvmCross
         {
             if (type == null)
                 throw new ArgumentNullException("type");
-
+            
             var item = container.GetAllInstances(type);
-            if(item != null && item.Count() > 1)
+            if(item != null && item.Count() >= 1 && !singletons.Contains(type))
                 // Ensure the dependency is registered as a singleton WITHOUT resolving the dependency twice.
                 throw new DependencyResolutionException(type.Name + "is registered more than once time.");
             else if (item != null && item.Count(e => e.GetType().Equals(type)) == 1)
@@ -286,8 +288,11 @@ namespace LightInject.Extras.MvvmCross
                 throw new ArgumentNullException("tInterface");
             if (theObject == null)
                 throw new ArgumentNullException("theObject");
+            
+            if (!singletons.Contains(tInterface))
+                singletons.Add(tInterface);
 
-            container.RegisterInstance(tInterface, theObject, serviceName);
+            container.RegisterInstance(tInterface, theObject);
             if (callbackRegisters.ContainsKey(tInterface))
                 callbackRegisters[tInterface]();
         }
@@ -312,7 +317,10 @@ namespace LightInject.Extras.MvvmCross
             if (theConstructor == null)
                 throw new ArgumentNullException("theConstructor");
 
-            container.RegisterInstance(tInterface, theConstructor(), serviceName);
+            if (!singletons.Contains(tInterface))
+                singletons.Add(tInterface);
+
+            container.RegisterInstance(tInterface, theConstructor());
             if (callbackRegisters.ContainsKey(tInterface))
                 callbackRegisters[tInterface]();
         }
@@ -358,7 +366,7 @@ namespace LightInject.Extras.MvvmCross
             if (constructor == null)
                 throw new ArgumentNullException("constructor");
             
-            var callbackRegisters = container.Register<TInterface>((type, service) => { return constructor(); });
+            container.Register<TInterface>(factory => constructor());
             if (callbackRegisters.ContainsKey(typeof(TInterface)))
                 callbackRegisters[typeof(TInterface)]();
         }
@@ -383,9 +391,16 @@ namespace LightInject.Extras.MvvmCross
             if (constructor == null)
                 throw new ArgumentNullException("constructor");
 
-            container.RegisterInstance(t, constructor(), serviceName);
-            if (callbackRegisters.ContainsKey(t))
-                callbackRegisters[t]();
+            // Does not work with LighInject yet.
+            throw new NotImplementedException();
+            //if (t == null)
+            //    throw new ArgumentNullException("t");
+            //if (constructor == null)
+            //    throw new ArgumentNullException("constructor");
+
+            //container.Register<typeof(t)>(factory => constructor());
+            //if (callbackRegisters.ContainsKey(t))
+            //    callbackRegisters[t]();
         }
 
         /// <summary>
@@ -414,7 +429,7 @@ namespace LightInject.Extras.MvvmCross
             if (tTo == null)
                 throw new ArgumentNullException("tTo");
 
-            container.Register(tFrom, tTo, serviceName);
+            container.Register(tFrom, tTo);
             if (callbackRegisters.ContainsKey(tFrom))
                 callbackRegisters[tFrom]();
         }
@@ -450,7 +465,11 @@ namespace LightInject.Extras.MvvmCross
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            return container.GetInstance(type, serviceName);
+            var item = container.GetInstance(type);
+            //if (!item.GetType().Equals(type))
+            //    throw new ComponentNotRegisteredException();
+
+            return item;
         }
 
         /// <summary>
@@ -495,7 +514,7 @@ namespace LightInject.Extras.MvvmCross
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            var item = container.TryGetInstance(type, serviceName);
+            var item = container.TryGetInstance(type);
             if (item != null)
             {
                 resolved = item;

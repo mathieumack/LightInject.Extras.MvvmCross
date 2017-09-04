@@ -1,6 +1,9 @@
 ﻿using System;
 using LightInject.Extras.MvvmCross.Pcl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MvvmCross.Platform.Core;
+using MvvmCross.Platform.IoC;
+using MvvmCross.Test.Core;
 
 namespace LightInject.Extras.MvvmCross.UnitTests
 {
@@ -8,12 +11,14 @@ namespace LightInject.Extras.MvvmCross.UnitTests
     public class LightInjectMvxIocProviderFixture : IDisposable
     {
         IServiceContainer container;
-
-        LightInjectIocProvider provider;
+        IMvxIoCProvider provider;
         
         [TestInitialize]
         public void BeforeEachMethod()
         {
+            MvxSingleton.ClearAllSingletons();
+            //ClearAll();
+
             container = new ServiceContainer();
             provider = new LightInjectIocProvider(container);
         }
@@ -21,7 +26,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         [TestMethod]
         public void CanResolveReturnsTrueWhenMatchingTypeIsRegistered()
         {
-            container.Register(c => new object());
+            provider.RegisterType<object>(() => new object());
 
             Assert.IsTrue(provider.CanResolve<object>());
         }
@@ -41,7 +46,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         [TestMethod]
         public void ResolveCreateAndIoCConstructReturnsRegisteredType()
         {
-            container.Register(c => new object());
+            provider.RegisterType<object>(() => new object());
 
             Assert.IsTrue(provider.Resolve<object>() is object);
             Assert.IsTrue(provider.Create<object>() is object);
@@ -67,7 +72,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         [TestMethod]
         public void GetSingletonReturnsSingletonIfTypeRegisteredAsSingleton()
         {
-            container.RegisterInstance(new object());
+            provider.RegisterSingleton(new object());
 
             Assert.IsTrue(provider.GetSingleton<object>() is object);
             Assert.AreSame(provider.GetSingleton<object>(), provider.GetSingleton<object>());
@@ -76,7 +81,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         [TestMethod]
         public void GetSingletonThrowsDependencyResolutionExceptionIfTypeRegisteredButNotAsSingleton()
         {
-            container.Register(c => new object());
+            provider.RegisterType<object>(() => new object());
 
             Assert.ThrowsException<DependencyResolutionException>(() => provider.GetSingleton<object>());
         }
@@ -96,7 +101,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         [TestMethod]
         public void TryResolveResolvesOutParameterWhenMatchingTypeRegistered()
         {
-            container.Register(c => new object());
+            provider.RegisterType<object>(() => new object());
 
             object foo;
             var success = provider.TryResolve(out foo);
@@ -193,7 +198,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
 
         public void Dispose()
         {
-            provider.Dispose();
+            container.Dispose();
         }
 
         private interface IInterface
