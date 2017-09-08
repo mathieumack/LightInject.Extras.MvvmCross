@@ -15,7 +15,7 @@
           <group>
             <!-- Always include regardless of target framework -->
             <dependency id="MvvmCross.Platform" version="5.1.0" />
-            <dependency id="LightInject" version="5.1.0" />
+            <dependency id="LightInject" version="4.1.5" />
         </group>
         </dependencies>  
     </metadata>
