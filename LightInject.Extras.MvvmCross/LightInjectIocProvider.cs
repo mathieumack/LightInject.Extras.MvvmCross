@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MvvmCross.Exceptions;
 using MvvmCross.IoC;
 
 namespace LightInject.Extras.MvvmCross
@@ -11,7 +12,6 @@ namespace LightInject.Extras.MvvmCross
         private readonly MvxPropertyInjectorOptions options;
 
         readonly Dictionary<Type, Action> callbackRegisters;
-        private readonly List<Type> singletons;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceContainer"/> class.
@@ -30,7 +30,6 @@ namespace LightInject.Extras.MvvmCross
             this.options = options ?? new MvxPropertyInjectorOptions();
             this.container = new ServiceContainer();
             this.callbackRegisters = new Dictionary<Type, Action>();
-            singletons = new List<Type>();
         }
 
         /// <summary>
@@ -204,7 +203,7 @@ namespace LightInject.Extras.MvvmCross
                 throw new ArgumentNullException("type");
             
             var item = container.GetAllInstances(type);
-            if(item != null && item.Any() && !singletons.Contains(type))
+            if(item != null && item.Any())
                 // Ensure the dependency is registered as a singleton WITHOUT resolving the dependency twice.
                 throw new DependencyResolutionException(type.Name + "is registered more than once time.");
             else if (item != null && item.Count(e => e.GetType().Equals(type)) == 1)
@@ -327,10 +326,7 @@ namespace LightInject.Extras.MvvmCross
             if (theObject == null)
                 throw new ArgumentNullException("theObject");
             
-            if (!singletons.Contains(tInterface))
-                singletons.Add(tInterface);
-
-            container.RegisterInstance(tInterface, theObject);
+            container.RegisterSingleton(tInterface, factory => theObject);
             if (callbackRegisters.ContainsKey(tInterface))
                 callbackRegisters[tInterface]();
         }
@@ -355,10 +351,7 @@ namespace LightInject.Extras.MvvmCross
             if (theConstructor == null)
                 throw new ArgumentNullException("theConstructor");
 
-            if (!singletons.Contains(tInterface))
-                singletons.Add(tInterface);
-
-            container.RegisterInstance(tInterface, theConstructor());
+            container.RegisterSingleton(tInterface, factory => theConstructor());
             if (callbackRegisters.ContainsKey(tInterface))
                 callbackRegisters[tInterface]();
         }
@@ -496,11 +489,15 @@ namespace LightInject.Extras.MvvmCross
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            var item = container.GetInstance(type);
-            //if (!item.GetType().Equals(type))
-            //    throw new ComponentNotRegisteredException();
-
-            return item;
+            try
+            {
+                var item = container.GetInstance(type);
+                return item;
+            }
+            catch(InvalidOperationException ex)
+            {
+                throw new MvxIoCResolveException(ex, "Element not registered");
+            }
         }
 
         /// <summary>

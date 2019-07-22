@@ -314,13 +314,27 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         }
 
         [TestMethod]
-        public void RegisterSingletonRegistersConcreteTypeAsSingletonAgainstInterface()
+        public void RegisterSingletonRegistersConcreteTypeAsSingletonAgainstInterfaceWithFisrtResolve()
         {
             var provider = this.CreateProvider();
             var concreteViaFunc = new Concrete();
             provider.RegisterSingleton<IInterface>(() => concreteViaFunc);
             Assert.AreEqual(concreteViaFunc, provider.Resolve<IInterface>());
             Assert.AreSame(provider.Resolve<IInterface>(), provider.Resolve<IInterface>());
+
+            var concreteInstance = new Concrete();
+            provider.RegisterSingleton<IInterface>(concreteInstance);
+            Assert.AreNotEqual(concreteInstance, provider.Resolve<IInterface>());
+            Assert.AreEqual(concreteViaFunc, provider.Resolve<IInterface>());
+            Assert.AreSame(provider.Resolve<IInterface>(), provider.Resolve<IInterface>());
+        }
+
+        [TestMethod]
+        public void RegisterSingletonRegistersConcreteTypeAsSingletonAgainstInterface()
+        {
+            var provider = this.CreateProvider();
+            var concreteViaFunc = new Concrete();
+            provider.RegisterSingleton<IInterface>(() => concreteViaFunc);
 
             var concreteInstance = new Concrete();
             provider.RegisterSingleton<IInterface>(concreteInstance);
