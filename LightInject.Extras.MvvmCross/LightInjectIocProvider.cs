@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject.Extras.MvvmCross.Pcl;
-using MvvmCross.Platform.Core;
-using MvvmCross.Platform.IoC;
+using MvvmCross.IoC;
 
 namespace LightInject.Extras.MvvmCross
 {
-    public class LightInjectIocProvider : MvxSingleton<IMvxIoCProvider>, IMvxIoCProvider 
+    public class LightInjectIocProvider : IMvxIoCProvider, IDisposable
     {
-        //private const string serviceName = "LightInjectServiceName";
-
-        readonly IServiceContainer container;
+        private readonly IServiceContainer container;
+        private readonly MvxPropertyInjectorOptions options;
 
         readonly Dictionary<Type, Action> callbackRegisters;
         private readonly List<Type> singletons;
@@ -25,11 +22,12 @@ namespace LightInject.Extras.MvvmCross
         /// <exception cref="System.ArgumentNullException">
         /// Thrown if <paramref name="container"/> is <see langword="null"/>.
         /// </exception>
-        public LightInjectIocProvider(IServiceContainer container)
+        public LightInjectIocProvider(IServiceContainer container, MvxPropertyInjectorOptions options = null)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
 
+            this.options = options ?? new MvxPropertyInjectorOptions();
             this.container = new ServiceContainer();
             this.callbackRegisters = new Dictionary<Type, Action>();
             singletons = new List<Type>();
@@ -161,6 +159,16 @@ namespace LightInject.Extras.MvvmCross
             return Resolve(type);
         }
 
+        public IMvxIoCProvider CreateChildContainer()
+        {
+            return new LightInjectIocProvider(container, options);
+        }
+
+        public void Dispose()
+        {
+            container.Dispose();
+        }
+
         /// <summary>
         /// Resolves a singleton service instance of a specified type.
         /// </summary>
@@ -196,7 +204,7 @@ namespace LightInject.Extras.MvvmCross
                 throw new ArgumentNullException("type");
             
             var item = container.GetAllInstances(type);
-            if(item != null && item.Count() >= 1 && !singletons.Contains(type))
+            if(item != null && item.Any() && !singletons.Contains(type))
                 // Ensure the dependency is registered as a singleton WITHOUT resolving the dependency twice.
                 throw new DependencyResolutionException(type.Name + "is registered more than once time.");
             else if (item != null && item.Count(e => e.GetType().Equals(type)) == 1)
@@ -233,7 +241,37 @@ namespace LightInject.Extras.MvvmCross
         /// </exception>
         public object IoCConstruct(Type type)
         {
-            return Resolve(type);
+            return container.Create(type);
+        }
+
+        public T IoCConstruct<T>(IDictionary<string, object> arguments) where T : class
+        {
+            return (T)container.GetInstance(typeof(T), arguments.Values.ToArray());
+        }
+
+        public T IoCConstruct<T>(object arguments) where T : class
+        {
+            return (T)container.GetInstance(typeof(T), new object[] { arguments });
+        }
+
+        public T IoCConstruct<T>(params object[] arguments) where T : class
+        {
+            return (T)container.GetInstance(typeof(T), arguments);
+        }
+
+        public object IoCConstruct(Type type, IDictionary<string, object> arguments)
+        {
+            return container.GetInstance(type, arguments.Values.ToArray());
+        }
+
+        public object IoCConstruct(Type type, object arguments)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object IoCConstruct(Type type, params object[] arguments)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -391,16 +429,9 @@ namespace LightInject.Extras.MvvmCross
             if (constructor == null)
                 throw new ArgumentNullException("constructor");
 
-            // Does not work with LighInject yet.
-            throw new NotImplementedException();
-            //if (t == null)
-            //    throw new ArgumentNullException("t");
-            //if (constructor == null)
-            //    throw new ArgumentNullException("constructor");
-
-            //container.Register<typeof(t)>(factory => constructor());
-            //if (callbackRegisters.ContainsKey(t))
-            //    callbackRegisters[t]();
+            container.Register(t, factory => constructor());
+            if (callbackRegisters.ContainsKey(t))
+                callbackRegisters[t]();
         }
 
         /// <summary>
