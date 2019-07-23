@@ -64,6 +64,8 @@ namespace LightInject.Extras.MvvmCross.UnitTests
             // Arrange
             var rootContainer = this.CreateProvider();
             rootContainer.RegisterType<IInterface, Concrete>();
+            Assert.IsTrue(rootContainer.CanResolve<IInterface>());
+            Assert.IsFalse(rootContainer.CanResolve<IInterface1>());
 
             // Act
             var childContainer = rootContainer.CreateChildContainer();
@@ -163,7 +165,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
                 });
 
             // Act
-            var obj = Mvx.IoCProvider.IoCConstruct<HasDependantProperty>();
+            var obj = provider.IoCConstruct<HasDependantProperty>();
 
             // Assert
             Assert.IsNotNull(obj);
@@ -176,11 +178,11 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         {
             // Arrange
             var provider = CreateProvider(new MvxPropertyInjectorOptions() { InjectIntoProperties = MvxPropertyInjection.AllInterfaceProperties });
-            Mvx.IoCProvider.RegisterType<IInterface1, Concrete1>();
-            Mvx.IoCProvider.RegisterType<IInterface2, Concrete2>();
+            provider.RegisterType<IInterface1, Concrete1>();
+            provider.RegisterType<IInterface2, Concrete2>();
 
             // Act
-            var obj = Mvx.IoCProvider.IoCConstruct<HasDependantProperty>();
+            var obj = provider.IoCConstruct<HasDependantProperty>();
 
             // Assert
             Assert.IsNotNull(obj);
@@ -193,12 +195,12 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         {
             // Arrange
             var provider = CreateProvider(new MvxPropertyInjectorOptions() { InjectIntoProperties = MvxPropertyInjection.AllInterfaceProperties });
-            Mvx.IoCProvider.RegisterType<IInterface1, Concrete1>();
-            Mvx.IoCProvider.RegisterType<IInterface2, Concrete2>();
-            Mvx.IoCProvider.RegisterSingleton<IHasDependentProperty>(Mvx.IoCProvider.IoCConstruct<HasDependantProperty>);
+            provider.RegisterType<IInterface1, Concrete1>();
+            provider.RegisterType<IInterface2, Concrete2>();
+            provider.RegisterSingleton<IHasDependentProperty>(provider.IoCConstruct<HasDependantProperty>);
 
             // Act
-            var obj = Mvx.IoCProvider.Resolve<IHasDependentProperty>();
+            var obj = provider.Resolve<IHasDependentProperty>();
 
             // Assert
             Assert.IsNotNull(obj);
@@ -215,11 +217,11 @@ namespace LightInject.Extras.MvvmCross.UnitTests
                 {
                     InjectIntoProperties = MvxPropertyInjection.MvxInjectInterfaceProperties,
                 });
-            Mvx.IoCProvider.RegisterType<IInterface1, Concrete1>();
-            Mvx.IoCProvider.RegisterType<IInterface2, Concrete2>();
+            provider.RegisterType<IInterface1, Concrete1>();
+            provider.RegisterType<IInterface2, Concrete2>();
 
             // Act
-            var obj = Mvx.IoCProvider.IoCConstruct<HasDependantProperty>();
+            var obj = provider.IoCConstruct<HasDependantProperty>();
 
             // Assert
             Assert.IsNotNull(obj);
@@ -236,12 +238,12 @@ namespace LightInject.Extras.MvvmCross.UnitTests
                 {
                     InjectIntoProperties = MvxPropertyInjection.MvxInjectInterfaceProperties,
                 });
-            Mvx.IoCProvider.RegisterType<IInterface1, Concrete1>();
-            Mvx.IoCProvider.RegisterType<IInterface2, Concrete2>();
-            Mvx.IoCProvider.RegisterSingleton<IHasDependentProperty>(Mvx.IoCProvider.IoCConstruct<HasDependantProperty>);
+            provider.RegisterType<IInterface1, Concrete1>();
+            provider.RegisterType<IInterface2, Concrete2>();
+            provider.RegisterSingleton<IHasDependentProperty>(provider.IoCConstruct<HasDependantProperty>);
 
             // Act
-            var obj = Mvx.IoCProvider.Resolve<IHasDependentProperty>();
+            var obj = provider.Resolve<IHasDependentProperty>();
 
             // Assert
             Assert.IsNotNull(obj);
@@ -254,11 +256,11 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         {
             // Arrange
             var provider = this.CreateProvider(new MvxPropertyInjectorOptions() { InjectIntoProperties = MvxPropertyInjection.AllInterfaceProperties });
-            Mvx.IoCProvider.RegisterType<IInterface1, Concrete1>();
-            Mvx.IoCProvider.RegisterType<IInterface2, Concrete2>();
+            provider.RegisterType<IInterface1, Concrete1>();
+            provider.RegisterType<IInterface2, Concrete2>();
 
             // Act
-            var obj = Mvx.IoCProvider.IoCConstruct<HasDependantProperty>();
+            var obj = provider.IoCConstruct<HasDependantProperty>();
 
             // Assert
             Assert.IsNotNull(obj);

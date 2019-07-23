@@ -10,8 +10,8 @@ namespace LightInject.Extras.MvvmCross
     {
         private readonly IServiceContainer container;
         private readonly MvxPropertyInjectorOptions options;
-
         readonly Dictionary<Type, Action> callbackRegisters;
+        private readonly List<Type> singletons;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceContainer"/> class.
@@ -28,8 +28,13 @@ namespace LightInject.Extras.MvvmCross
                 throw new ArgumentNullException("container");
 
             this.options = options ?? new MvxPropertyInjectorOptions();
-            this.container = new ServiceContainer();
+            this.container = new ServiceContainer(new ContainerOptions()
+            {
+                EnablePropertyInjection = this.options.InjectIntoProperties != MvxPropertyInjection.None
+            });
+
             this.callbackRegisters = new Dictionary<Type, Action>();
+            singletons = new List<Type>();
         }
 
         /// <summary>
@@ -123,8 +128,8 @@ namespace LightInject.Extras.MvvmCross
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            var item = container.GetAllInstances(type);
-            return item != null && item.Any(e => e.GetType().Equals(type));
+            var instance = container.TryGetInstance(type);
+            return instance != null;
         }
 
         /// <summary>
@@ -203,13 +208,16 @@ namespace LightInject.Extras.MvvmCross
                 throw new ArgumentNullException("type");
             
             var item = container.GetAllInstances(type);
-            if(item != null && item.Any())
+            if(item == null || item.Count() > 1)
                 // Ensure the dependency is registered as a singleton WITHOUT resolving the dependency twice.
-                throw new DependencyResolutionException(type.Name + "is registered more than once time.");
-            else if (item != null && item.Count(e => e.GetType().Equals(type)) == 1)
-                return item.First(e => e.GetType().Equals(type));
+                throw new DependencyResolutionException(type.Name + "is registered more than once time or not registered.");
+            if (item.Count() == 1 && !singletons.Contains(type))
+                // Ensure the dependency is registered as a singleton WITHOUT resolving the dependency twice.
+                throw new DependencyResolutionException(type.Name + "is not registered as singleton.");
+            else if (item.Count() == 1 && singletons.Contains(type))
+                return item.First();
             else
-                throw new ComponentNotRegisteredException(type.Name + " not registered");
+                throw new ComponentNotRegisteredException(type.Name + " not registered.");
         }
 
         /// <summary>
@@ -350,6 +358,9 @@ namespace LightInject.Extras.MvvmCross
                 throw new ArgumentNullException("tInterface");
             if (theConstructor == null)
                 throw new ArgumentNullException("theConstructor");
+
+            if (!singletons.Contains(tInterface))
+                singletons.Add(tInterface);
 
             container.RegisterSingleton(tInterface, factory => theConstructor());
             if (callbackRegisters.ContainsKey(tInterface))
