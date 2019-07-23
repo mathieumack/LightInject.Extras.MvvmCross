@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MvvmCross.Base;
 using MvvmCross.Exceptions;
@@ -41,16 +39,13 @@ namespace LightInject.Extras.MvvmCross.UnitTests
 
             this._disposables.Clear();
         }
-
-        
+                
         [TestMethod]
         public void CanCreateChildContainers()
         {
             // Arrange
             var rootContainer = this.CreateProvider();
             rootContainer.RegisterType<IInterface, Concrete>();
-            Assert.IsTrue(rootContainer.CanResolve<IInterface>());
-            Assert.IsFalse(rootContainer.CanResolve<IInterface1>());
 
             // Act
             var childContainer = rootContainer.CreateChildContainer();
@@ -62,8 +57,6 @@ namespace LightInject.Extras.MvvmCross.UnitTests
             Assert.IsTrue(rootContainer.CanResolve<IInterface>());
             Assert.IsFalse(rootContainer.CanResolve<IInterface1>());
         }
-
-
         
         [TestMethod]
         public void RegisterTypeRegistersConcreteTypeAgainstInterface()

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MvvmCross.Base;
-using MvvmCross.Exceptions;
 using MvvmCross.IoC;
 
 namespace LightInject.Extras.MvvmCross.UnitTests
@@ -22,6 +19,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
 
         private interface IHasDependentProperty
         {
+            [Inject]
             IInterface1 Dependency { get; set; }
 
             IInterface2 MarkedDependency { get; set; }
@@ -120,11 +118,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         public void InjectsOnlyMarkedPropertiesIfEnabled()
         {
             // Arrange
-            var provider = this.CreateProvider(options:
-                new MvxPropertyInjectorOptions()
-                {
-                    InjectIntoProperties = MvxPropertyInjection.MvxInjectInterfaceProperties,
-                });
+            var provider = this.CreateProvider(new MvxPropertyInjectorOptions() { InjectIntoProperties = MvxPropertyInjection.MvxInjectInterfaceProperties });
             provider.RegisterType<IInterface1, Concrete1>();
             provider.RegisterType<IInterface2, Concrete2>();
 
@@ -133,19 +127,15 @@ namespace LightInject.Extras.MvvmCross.UnitTests
 
             // Assert
             Assert.IsNotNull(obj);
-            Assert.IsNull(obj.Dependency);
-            Assert.IsNotNull(obj.MarkedDependency);
+            Assert.IsNotNull(obj.Dependency);
+            Assert.IsNull(obj.MarkedDependency);
         }
 
         [TestMethod]
         public void InjectsOnlyMarkedPropertiesIfEnabled_Lazy()
         {
             // Arrange
-            var provider = this.CreateProvider(options:
-                new MvxPropertyInjectorOptions()
-                {
-                    InjectIntoProperties = MvxPropertyInjection.MvxInjectInterfaceProperties,
-                });
+            var provider = this.CreateProvider(new MvxPropertyInjectorOptions() { InjectIntoProperties = MvxPropertyInjection.MvxInjectInterfaceProperties });
             provider.RegisterType<IInterface1, Concrete1>();
             provider.RegisterType<IInterface2, Concrete2>();
             provider.RegisterSingleton<IHasDependentProperty>(provider.IoCConstruct<HasDependantProperty>);
@@ -222,8 +212,10 @@ namespace LightInject.Extras.MvvmCross.UnitTests
 
         private class Concrete : IInterface
         {
+            [Inject]
             public Exception PropertyToInject { get; set; }
 
+            [Inject]
             public Exception PropertyToSkip { get; set; }
         }
 
@@ -237,9 +229,9 @@ namespace LightInject.Extras.MvvmCross.UnitTests
 
         private class HasDependantProperty : IHasDependentProperty
         {
+            [Inject]
             public IInterface1 Dependency { get; set; }
 
-            [Inject]
             public IInterface2 MarkedDependency { get; set; }
         }
     }

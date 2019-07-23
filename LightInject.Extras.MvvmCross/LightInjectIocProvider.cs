@@ -28,10 +28,7 @@ namespace LightInject.Extras.MvvmCross
                 throw new ArgumentNullException("container");
 
             this.options = options ?? new MvxPropertyInjectorOptions();
-            this.container = new ServiceContainer(new ContainerOptions()
-            {
-                EnablePropertyInjection = this.options.InjectIntoProperties != MvxPropertyInjection.None
-            });
+            this.container = container;
 
             this.callbackRegisters = new Dictionary<Type, Action>();
             singletons = new List<Type>();
@@ -165,7 +162,15 @@ namespace LightInject.Extras.MvvmCross
 
         public IMvxIoCProvider CreateChildContainer()
         {
-            return new LightInjectIocProvider(container, options);
+            var subContainer = new ServiceContainer(new ContainerOptions()
+            {
+                EnablePropertyInjection = this.options.InjectIntoProperties != MvxPropertyInjection.None
+            });
+
+            foreach (var availableservice in container.AvailableServices)
+                subContainer.Register(availableservice);
+
+            return new LightInjectIocProvider(subContainer, options);
         }
 
         public void Dispose()
