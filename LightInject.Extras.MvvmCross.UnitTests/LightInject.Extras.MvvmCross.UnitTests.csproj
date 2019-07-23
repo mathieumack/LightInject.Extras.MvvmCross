@@ -70,7 +70,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LightInjectMvxIocProviderFixture.cs" />
+    <Compile Include="ProviderFixtureResolve.cs" />
+    <Compile Include="ProviderFixtureCallbacks.cs" />
+    <Compile Include="ProviderFixtureCanResolve.cs" />
+    <Compile Include="ProviderFixtureSingleton.cs" />
+    <Compile Include="ProviderFixturePropertyInjection.cs" />
+    <Compile Include="ProviderFixtureRegisters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
