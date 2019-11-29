@@ -27,8 +27,11 @@ namespace LightInject.Extras.MvvmCross
             if (container == null)
                 throw new ArgumentNullException("container");
 
-            this.options = options ?? new MvxPropertyInjectorOptions();
+            this.options = options ?? new MvxPropertyInjectorOptions() { InjectIntoProperties = MvxPropertyInjection.None };
             this.container = container;
+
+            if (this.options.InjectIntoProperties == MvxPropertyInjection.MvxInjectInterfaceProperties)
+                throw new NotSupportedException(MvxPropertyInjection.MvxInjectInterfaceProperties.ToString() + " is not supported");
 
             this.callbackRegisters = new Dictionary<Type, Action>();
             singletons = new List<Type>();
@@ -162,10 +165,10 @@ namespace LightInject.Extras.MvvmCross
 
         public IMvxIoCProvider CreateChildContainer()
         {
-            var subContainer = new ServiceContainer(new ContainerOptions()
-            {
-                EnablePropertyInjection = this.options.InjectIntoProperties != MvxPropertyInjection.None
-            });
+            var subContainer = new ServiceContainer();
+
+            if(this.options.InjectIntoProperties != MvxPropertyInjection.None)
+                subContainer.EnableAnnotatedPropertyInjection();
 
             foreach (var availableservice in container.AvailableServices)
                 subContainer.Register(availableservice);
