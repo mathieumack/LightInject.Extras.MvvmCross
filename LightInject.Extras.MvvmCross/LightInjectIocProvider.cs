@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MvvmCross.Base;
 using MvvmCross.Exceptions;
 using MvvmCross.IoC;
 
 namespace LightInject.Extras.MvvmCross
 {
-    public class LightInjectIocProvider : MvxSingleton<IMvxIoCProvider>, IMvxIoCProvider
+    public class LightInjectIocProvider : IMvxIoCProvider, IDisposable
     {
         private readonly IServiceContainer container;
         private readonly MvxPropertyInjectorOptions options;
@@ -124,7 +123,7 @@ namespace LightInject.Extras.MvvmCross
         public bool CanResolve(Type type)
         {
             if (type == null)
-                throw new ArgumentNullException(nameof(type));
+                throw new ArgumentNullException("type");
 
             var instance = container.TryGetInstance(type);
             return instance != null;
@@ -212,14 +211,14 @@ namespace LightInject.Extras.MvvmCross
         {
             if (type == null)
                 throw new ArgumentNullException("type");
-
+            
             var item = container.GetAllInstances(type);
-            if (item == null || item.Count() > 1)
+            if(item == null || item.Count() > 1)
                 // Ensure the dependency is registered as a singleton WITHOUT resolving the dependency twice.
-                throw new DependencyResolutionException(type.Name + " is registered more than once time or not registered.");
+                throw new DependencyResolutionException(type.Name + "is registered more than once time or not registered.");
             if (item.Count() == 1 && !singletons.Contains(type))
                 // Ensure the dependency is registered as a singleton WITHOUT resolving the dependency twice.
-                throw new DependencyResolutionException(type.Name + " is not registered as singleton.");
+                throw new DependencyResolutionException(type.Name + "is not registered as singleton.");
             else if (item.Count() == 1 && singletons.Contains(type))
                 return item.First();
             else
@@ -254,17 +253,7 @@ namespace LightInject.Extras.MvvmCross
         /// </exception>
         public object IoCConstruct(Type type)
         {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-
-            try
-            {
-                return container.Create(type);
-            }
-            catch(Exception ex)
-            {
-                throw new DependencyResolutionException("Error during creation", ex);
-            }
+            return container.Create(type);
         }
 
         public T IoCConstruct<T>(IDictionary<string, object> arguments) where T : class
@@ -349,13 +338,8 @@ namespace LightInject.Extras.MvvmCross
                 throw new ArgumentNullException("tInterface");
             if (theObject == null)
                 throw new ArgumentNullException("theObject");
-            if (singletons.Contains(tInterface))
-                throw new SingletonAlreadyRegisteredException(tInterface.Name);
-
-            container.RegisterSingleton(tInterface, factory => theObject);
             
-            if (!singletons.Contains(tInterface))
-                singletons.Add(tInterface);
+            container.RegisterSingleton(tInterface, factory => theObject);
             if (callbackRegisters.ContainsKey(tInterface))
                 callbackRegisters[tInterface]();
         }
@@ -428,7 +412,7 @@ namespace LightInject.Extras.MvvmCross
         {
             if (constructor == null)
                 throw new ArgumentNullException("constructor");
-
+            
             container.Register<TInterface>(factory => constructor());
             if (callbackRegisters.ContainsKey(typeof(TInterface)))
                 callbackRegisters[typeof(TInterface)]();
@@ -519,16 +503,16 @@ namespace LightInject.Extras.MvvmCross
         public object Resolve(Type type)
         {
             if (type == null)
-                throw new ArgumentNullException(nameof(type));
+                throw new ArgumentNullException("type");
 
             try
             {
                 var item = container.GetInstance(type);
                 return item;
             }
-            catch (InvalidOperationException ex)
+            catch(InvalidOperationException ex)
             {
-                throw new ComponentNotRegisteredException("Element not registered", ex);
+                throw new MvxIoCResolveException(ex, "Element not registered");
             }
         }
 
