@@ -11,7 +11,7 @@ namespace LightInject.Extras.MvvmCross
         private readonly IServiceContainer container;
         private readonly MvxPropertyInjectorOptions options;
         readonly Dictionary<Type, Action> callbackRegisters;
-        private readonly List<Type> singletons;
+        private readonly List<Type> singletons; 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceContainer"/> class.
