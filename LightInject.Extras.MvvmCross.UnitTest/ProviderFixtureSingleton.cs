@@ -7,7 +7,7 @@ using MvvmCross.Base;
 using MvvmCross.Exceptions;
 using MvvmCross.IoC;
 
-namespace LightInject.Extras.MvvmCross.UnitTests
+namespace LightInject.Extras.MvvmCross.UnitTest
 {
     [TestClass]
     public class ProviderFixtureSingleton : IDisposable

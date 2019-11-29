@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MvvmCross.Base;
 using MvvmCross.IoC;
 
-namespace LightInject.Extras.MvvmCross.UnitTests
+namespace LightInject.Extras.MvvmCross.UnitTest
 {
     [TestClass]
     public class ProviderFixtureCallbacks : IDisposable

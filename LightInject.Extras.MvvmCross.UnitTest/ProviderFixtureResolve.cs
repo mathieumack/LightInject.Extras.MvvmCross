@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MvvmCross.Base;
+using MvvmCross.Exceptions;
 using MvvmCross.IoC;
 
-namespace LightInject.Extras.MvvmCross.UnitTests
+namespace LightInject.Extras.MvvmCross.UnitTest
 {
     [TestClass]
-    public class ProviderFixtureCanResolve : IDisposable
+    public class ProviderFixtureResolve : IDisposable
     {
         [TestInitialize]
         public void BeforeEachMethod()
@@ -16,14 +17,6 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         }
 
         private readonly List<IDisposable> _disposables = new List<IDisposable>();
-
-        private interface IInterface1
-        {
-        }
-
-        private interface IInterface2
-        {
-        }
 
         public void Dispose()
         {
@@ -36,38 +29,32 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         }
 
         [TestMethod]
-        public void CanResolveReturnsFalseWhenNoMatchingTypeIsRegistered()
-        {
-            var provider = this.CreateProvider();
-            Assert.IsFalse(provider.CanResolve<object>());
-        }
-
-        [TestMethod]
-        public void TryResolveResolvesOutParameterWhenMatchingTypeRegistered()
+        public void ResolveCreateAndIoCConstructReturnsRegisteredType()
         {
             var provider = this.CreateProvider();
             provider.RegisterType(typeof(object), () => new object());
 
-            object foo;
-            var success = provider.TryResolve(out foo);
-
-            Assert.IsInstanceOfType(foo, typeof(object));
-            Assert.IsTrue(success);
+            Assert.IsInstanceOfType(provider.Resolve<object>(), typeof(object));
+            Assert.IsInstanceOfType(provider.Create<object>(), typeof(object));
+            Assert.IsInstanceOfType(provider.IoCConstruct<object>(), typeof(object));
         }
 
         [TestMethod]
-        public void CanResolveReturnsTrueWhenMatchingTypeIsRegistered()
+        public void ResolveCreateAndIoCConstructThrowsArgumentNullExceptionWhenCalledWithNoTypeArgument()
         {
             var provider = this.CreateProvider();
-            provider.RegisterType(typeof(object));
-            Assert.IsTrue(provider.CanResolve<object>());
+            Assert.ThrowsException<ArgumentNullException>(() => provider.Resolve(null));
+            Assert.ThrowsException<ArgumentNullException>(() => provider.Create(null));
+            Assert.ThrowsException<ArgumentNullException>(() => provider.IoCConstruct(null));
         }
 
         [TestMethod]
-        public void CanResolveThrowsArgumentNullExceptionWhenCalledWithNoTypeArgument()
+        public void ResolveCreateAndIoCConstructThrowsComponentNotRegisteredExceptionWhenNoTypeRegistered()
         {
             var provider = this.CreateProvider();
-            Assert.ThrowsException<ArgumentNullException>(() => provider.CanResolve(null));
+            Assert.ThrowsException<MvxIoCResolveException>(() => provider.Resolve<object>());
+            Assert.ThrowsException<MvxIoCResolveException>(() => provider.Create<object>());
+            Assert.IsNotNull(provider.IoCConstruct<object>());
         }
 
         private LightInjectIocProvider CreateProvider(MvxPropertyInjectorOptions options = null)

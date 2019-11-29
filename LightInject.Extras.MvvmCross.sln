@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{AD80
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1FD2D5D0-F784-45E7-8E0C-27E586576E37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightInject.Extras.MvvmCross.UnitTests", "LightInject.Extras.MvvmCross.UnitTests\LightInject.Extras.MvvmCross.UnitTests.csproj", "{6A9AE3A0-B468-446A-9166-EC7E7BA5811B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LightInject.Extras.MvvmCross.UnitTest", "LightInject.Extras.MvvmCross.UnitTest\LightInject.Extras.MvvmCross.UnitTest.csproj", "{6A9AE3A0-B468-446A-9166-EC7E7BA5811B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
