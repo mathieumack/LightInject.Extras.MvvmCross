@@ -17,7 +17,7 @@ namespace LightInject.Extras.MvvmCross
         /// Initializes a new instance of the <see cref="ServiceContainer"/> class.
         /// </summary>
         /// <param name="container">
-        /// The container from which dependencies should be resolved.
+        /// The container from which dependencies should be resolved. 
         /// </param>
         /// <exception cref="System.ArgumentNullException">
         /// Thrown if <paramref name="container"/> is <see langword="null"/>.
