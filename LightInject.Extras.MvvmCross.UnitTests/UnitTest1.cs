@@ -1,9 +1,7 @@
 ﻿using System;
-using LightInject.Extras.MvvmCross.Pcl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MvvmCross.Platform.Core;
-using MvvmCross.Platform.IoC;
-using MvvmCross.Test.Core;
+using MvvmCross.Base;
+using MvvmCross.IoC;
 
 namespace LightInject.Extras.MvvmCross.UnitTests
 {
@@ -58,7 +56,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
         {
             Assert.ThrowsException<ComponentNotRegisteredException>(() => provider.Resolve<object>());
             Assert.ThrowsException<ComponentNotRegisteredException>(() => provider.Create<object>());
-            Assert.ThrowsException<ComponentNotRegisteredException>(() => provider.IoCConstruct<object>());
+            Assert.ThrowsException<DependencyResolutionException>(() => provider.IoCConstruct<Concrete2>());
         }
 
         [TestMethod]
@@ -164,9 +162,7 @@ namespace LightInject.Extras.MvvmCross.UnitTests
             Assert.AreSame(provider.Resolve<IInterface>(), provider.Resolve<IInterface>());
 
             var concreteInstance = new Concrete();
-            provider.RegisterSingleton<IInterface>(concreteInstance);
-            Assert.AreEqual(concreteInstance, provider.Resolve<IInterface>());
-            Assert.AreSame(provider.Resolve<IInterface>(), provider.Resolve<IInterface>());
+            Assert.ThrowsException<SingletonAlreadyRegisteredException>(() => provider.RegisterSingleton<IInterface>(concreteInstance));
         }
 
         [TestMethod]
@@ -207,6 +203,16 @@ namespace LightInject.Extras.MvvmCross.UnitTests
 
         private class Concrete : IInterface
         {
+        }
+
+        private class Concrete2 : IInterface
+        {
+            private readonly Concrete concrete;
+
+            public Concrete2(Concrete concrete)
+            {
+                this.concrete = concrete;
+            }
         }
     }
 

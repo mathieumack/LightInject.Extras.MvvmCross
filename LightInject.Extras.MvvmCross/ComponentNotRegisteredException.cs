@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace LightInject.Extras.MvvmCross.Pcl
+namespace LightInject.Extras.MvvmCross
 {
-    public class DependencyResolutionException : Exception
+    public class ComponentNotRegisteredException : Exception
     {
         //
         // Summary:
         //     Initializes a new instance of the System.Exception class.
-        public DependencyResolutionException()
+        public ComponentNotRegisteredException()
             : base()
         {
 
@@ -24,7 +20,7 @@ namespace LightInject.Extras.MvvmCross.Pcl
         // Parameters:
         //   message:
         //     The message that describes the error.
-        public DependencyResolutionException(string message)
+        public ComponentNotRegisteredException(string message)
             : base(message)
         {
 
@@ -41,7 +37,7 @@ namespace LightInject.Extras.MvvmCross.Pcl
         //   innerException:
         //     The exception that is the cause of the current exception, or a null reference
         //     (Nothing in Visual Basic) if no inner exception is specified.
-        public DependencyResolutionException(string message, Exception innerException)
+        public ComponentNotRegisteredException(string message, Exception innerException)
             : base(message, innerException)
         {
 

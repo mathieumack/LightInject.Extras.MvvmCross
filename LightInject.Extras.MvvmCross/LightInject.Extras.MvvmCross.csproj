@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>MACK Mathieu</Authors>
+    <Company></Company>
+    <Copyright>Copyright (c) MACK Mathieu</Copyright>
+    <Product />
+    <RepositoryUrl>https://github.com/mathieumack/LightInject.Extras.MvvmCross</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/mathieumack/LightInject.Extras.MvvmCross</PackageProjectUrl>
+    <PackageTags>lightinject mvvmcross</PackageTags>
+    <ProjectGuid>{BB3C51E5-44CA-44A6-B5DE-B6A897A41307}</ProjectGuid>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LightInject" Version="6.2.0" />
+    <PackageReference Include="MvvmCross" Version="6.4.1" />
+  </ItemGroup>
+
+</Project>
