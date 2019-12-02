@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="LightInject" Version="6.2.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
-    <PackageReference Include="MvvmCross" Version="6.3.0" />
+    <PackageReference Include="MvvmCross" Version="6.4.1" />
   </ItemGroup>
 
 </Project>
