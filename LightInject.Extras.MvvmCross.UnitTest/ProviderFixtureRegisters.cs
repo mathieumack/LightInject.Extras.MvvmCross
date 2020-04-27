@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MvvmCross.Base;
 using MvvmCross.Exceptions;
@@ -7,6 +8,7 @@ using MvvmCross.IoC;
 
 namespace LightInject.Extras.MvvmCross.UnitTest
 {
+    [ExcludeFromCodeCoverage]
     [TestClass]
     public class ProviderFixtureRegisters : IDisposable
     {
