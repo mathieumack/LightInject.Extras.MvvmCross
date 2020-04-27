@@ -5,7 +5,7 @@ namespace LightInject.Extras.MvvmCross
     /// <summary>
     /// 
     /// </summary>
-    public class SingletonAlreadyRegisteredException : Exception
+    public class SingletonAlreadyRegisteredException : Exception 
     {
         /// <inheritdoc/>
         public SingletonAlreadyRegisteredException()
