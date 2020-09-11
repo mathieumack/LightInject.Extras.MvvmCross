@@ -1,0 +1,28 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras">
+
+  <PropertyGroup>
+    <ProjectGuid>{5D8117A4-0B24-48B0-922C-1EACCDCD70AD}</ProjectGuid>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>LightInject.Extras.MvvmCross</PackageId>
+    <Authors>MACK Mathieu</Authors>
+    <Copyright>Copyright (c) MACK Mathieu</Copyright>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/mathieumack/LightInject.Extras.MvvmCross</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mathieumack/LightInject.Extras.MvvmCross</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>This package contains the LightInject IOC provider for MvvmCross.</Description>
+    <RootNamespace>LightInject.Extras.MvvmCross</RootNamespace>
+    <AssemblyName>LightInject.Extras.MvvmCross</AssemblyName>
+    <Product>engine report and helpers for the OpenXML SDK</Product>
+    <PackageTags>mvvmcross,plugin,lightinject</PackageTags>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="LightInject" Version="6.3.4" />
+    <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
+    <PackageReference Include="MvvmCross" Version="7.0.0" />
+  </ItemGroup>
+
+</Project>
